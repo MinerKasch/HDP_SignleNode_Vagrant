@@ -1,0 +1,9 @@
+---
+- hosts: all
+  max_fail_percentage: 0
+  roles:
+    - common
+    - ssh_no_password
+    - ambari_server
+    - ambari_agent
+    - hdp_single_node

@@ -1,0 +1,4 @@
+ambari_server: localhost
+ambari_server_port: 8080
+blueprint_name: accumulo-scala-singlenode
+cluster_name: minerkasch

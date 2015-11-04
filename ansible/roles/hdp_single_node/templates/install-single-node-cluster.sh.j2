@@ -1,0 +1,68 @@
+#!/usr/bin/env bash
+
+BASEURL=http://{{ ambari_server }}:{{ ambari_server_port }}/api/v1
+BLUEPRINT_NAME={{ blueprint_name }}
+CLUSTER_NAME={{ cluster_name }}
+
+echo "Attempting to create cluster..."
+{% raw %}
+# only register and create the cluster if we haven't already
+if [[ ! $(curl -s -H 'X-Requested-By: ambari' -u admin:admin -X GET $BASEURL/blueprints) =~ "$BLUEPRINT_NAME" ]]; then
+    # register the blueprint
+    echo "Registering blueprint..."
+
+    result=$(curl -s -H 'X-Requested-By: ambari' -u admin:admin -X POST $BASEURL/blueprints/$BLUEPRINT_NAME -d @accumulo_scala_blueprint.json)
+    if [ ${#result} -gt 0 ]; then
+        echo 'ERROR: Failed to register blueprint: '
+        echo $result
+        exit 1
+    fi
+    echo "SUCCESS"
+
+    # create the cluster
+    echo "Creating cluster..."
+    result=$(curl -s -H 'X-Requested-By: ambari' -u admin:admin -X POST $BASEURL/clusters/$CLUSTER_NAME -d @accumulo_scala_create.json)
+    re='.*"href"\s*:\s*"([^"]+)".*'
+    if [[ $result =~ $re ]]; then
+        progress=${BASH_REMATCH[1]}
+        echo 'Will monitor progress URL: $progress'
+    else
+        echo 'ERROR: Failed to create cluster: '
+        echo $result
+        exit 1
+    fi
+    echo "SUCCESS"
+
+    echo "Waiting for cluster to provision..."
+    # poll the progress URL until we are done
+    re='.*"request_status"\s*:\s*"([^"]+)".*'
+    ppre='.*"progress_percent"\s*:\s*"([^"]+)".*'
+    while true; do
+        sleep 10
+        result=$(curl -s -H 'X-Requested-By: ambari' -u admin:admin -X GET $progress)
+        if [[ $result =~ $re ]]; then
+            status=${BASH_REMATCH[1]}
+        else
+            echo 'ERROR: Failed to read the progress result: '
+            echo $result
+            exit 1
+        fi
+
+        if [[ $status == "COMPLETED" ]]; then
+            break
+        else
+            if [[ $result =~ $ppre ]]; then
+                echo 'Progress: ${BASH_REMATCH[1]}%'
+            fi
+        fi
+    done
+
+    echo "SUCCESS"
+else
+    echo "Cluster has already been created - skipping."
+fi
+{% endraw %}
+
+# NOTE: you can delete the blueprint and cluster using these commands
+# curl -s -H 'X-Requested-By: ambari' -u admin:admin -X DELETE $BASEURL/blueprints/$DEVNODENAME
+# curl -s -H 'X-Requested-By: ambari' -u admin:admin -X DELETE $BASEURL/clusters/$CLUSTER_NAME

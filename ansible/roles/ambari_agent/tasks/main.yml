@@ -1,0 +1,40 @@
+#
+# Install the Ambari Agent
+#
+
+- name: Create Ambari Repo {{ ambari_repo }}
+  get_url: url={{ ambari_repo }} dest=/etc/apt/sources.list.d/ambari.list
+  sudo: yes
+  tags:
+    - ambari_agent_install
+
+- name: Update the key server
+  apt_key: keyserver=keyserver.ubuntu.com id=B9733A7A07513CAD
+  sudo: yes
+  tags:
+    - ambari_agent_install
+
+- name: Install Ambari Agent
+  apt: name=ambari-agent update_cache=yes
+  sudo: yes
+  tags:
+    - ambari_agent_install
+
+- name: Configure Ambari Agent
+  lineinfile: dest={{ ambari_agent_conf }} regexp='^hostname=' line='hostname={{ ambari_agent_server }}'
+  sudo: yes
+  tags:
+    - ambari_agent_install
+
+- name: Start Ambari Agent
+  service: name=ambari-agent state=started enabled=yes
+  sudo: yes
+  register: result
+  tags:
+    - ambari_agent_install
+
+- name: Wait for the Ambari Agent to register with Ambari Server
+  pause: seconds=60
+  when: result|changed
+  tags:
+    - ambari_agent_install

@@ -1,0 +1,29 @@
+#
+# Install a single node using a blueprint
+#
+
+- name: Creating a temp directory for the installation files
+  file: path={{ tmp }}/singlenode/ state=directory
+  tags:
+    - single_node_install
+
+- name: Copy over Ambari single node install script and files
+  template: src={{ item }}.j2 dest={{ tmp }}/singlenode/{{ item }} mode=744
+  with_items:
+    - install-single-node-cluster.sh
+  tags:
+    - single_node_install
+
+
+- name: Copy over Ambari single node install script and files
+  copy: src={{ item }} dest={{ tmp }}/singlenode/{{ item }} mode=744
+  with_items:
+    - accumulo_scala_blueprint.json
+    - accumulo_scala_create.json
+  tags:
+    - single_node_install
+
+- name: Run the install script
+  shell: ./install-single-node-cluster.sh chdir={{ tmp }}/singlenode/
+  tags:
+    - single_node_install

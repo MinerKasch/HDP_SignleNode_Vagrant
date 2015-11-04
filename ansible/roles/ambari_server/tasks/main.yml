@@ -1,0 +1,46 @@
+#
+# Install the Ambari server
+#
+
+- name: Create Ambari Repo {{ ambari_repo }}
+  get_url: url={{ ambari_repo }} dest=/etc/apt/sources.list.d/ambari.list
+  sudo: yes
+  tags:
+    - ambari_server_install
+
+- name: Update the key server
+  apt_key: keyserver=keyserver.ubuntu.com id=B9733A7A07513CAD
+  sudo: yes
+  tags:
+    - ambari_server_install
+
+- name: Install Ambari Server
+  apt: name=ambari-server update_cache=yes
+  sudo: yes
+
+- name: Get Ambari's status
+  command: ambari-server status
+  register: ambari_status
+  tags:
+    - ambari_server_install
+
+- name: Configure Ambari Server
+  command: ambari-server setup -s
+  sudo: yes
+  when: ambari_status.stdout | search('.*Ambari Server not running.*')
+  tags:
+    - ambari_server_install
+
+- name: Start Ambari Server
+  service: name=ambari-server state=restarted
+  sudo: yes
+  when: ambari_status.stdout | search('.*Ambari Server not running.*')
+  tags:
+    - ambari_server_install
+
+- name: Wait for Ambari Server to start
+  wait_for: port={{ ambari_server_port }} delay=10 timeout=60
+  sudo: yes
+  when: ambari_status.stdout | search('.*Ambari Server not running.*')
+  tags:
+    - ambari_server_install

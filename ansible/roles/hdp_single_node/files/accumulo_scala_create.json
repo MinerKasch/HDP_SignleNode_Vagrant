@@ -1,0 +1,13 @@
+{
+  "blueprint" : "accumulo-scala-singlenode",
+  "host_groups" :[
+    {
+      "name" : "host_group_1",
+      "hosts" : [
+        {
+          "fqdn" : "dev.minerkasch.com"
+        }
+      ]
+    }
+  ]
+}

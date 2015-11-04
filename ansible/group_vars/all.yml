@@ -1,0 +1,7 @@
+
+user: 'vagrant'
+group: 'vagrant'
+
+# Location of the general tmp folder
+tmp: '/tmp'
+

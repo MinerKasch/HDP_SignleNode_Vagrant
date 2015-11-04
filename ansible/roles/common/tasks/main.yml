@@ -1,0 +1,20 @@
+- name: Install default packages
+  apt: name={{item}} state=latest
+  sudo: yes
+  with_items:
+    - ntp
+    - wget
+  tags:
+    - common
+
+- name: Start NTP
+  service: name=ntp state=started enabled=yes
+  sudo: yes
+  tags:
+    - common
+
+- name: Stop iptables
+  service: name=ufw state=stopped enabled=no
+  sudo: yes
+  tags:
+    - common
