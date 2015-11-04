@@ -10,7 +10,7 @@ Out of the box, the Vagrant environment requires 8 GB of RAM, 2 CPUs, and 40 GB 
 
 The following software must be installed locally before starting the Vagrant environment.
 
-* Virtualbox - https://www.virtualbox.org/wiki/Downloads
+* VirtualBox - https://www.virtualbox.org/wiki/Downloads
 * Vagrant - https://www.vagrantup.com/downloads.html
 * Ansible - https://github.com/ansible/ansible
 
