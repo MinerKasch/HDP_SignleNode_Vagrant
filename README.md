@@ -19,7 +19,7 @@ The following software must be installed locally before starting the Vagrant env
 Once all of the requirements are met, clone the git repository to your local machine, change directories to the newly cloned repo, and issue ```vagrant up```. The complete list of commands for the installation steps is as follows:
 
 ```
-$ git clone git@github.com:MinerKasch/HDP_SignleNode_Vagrant.git@github
+$ git clone https://github.com/MinerKasch/HDP_SignleNode_Vagrant.git
 $ cd HDP_SignleNode_Vagrant
 $ vagrant up
 ```
