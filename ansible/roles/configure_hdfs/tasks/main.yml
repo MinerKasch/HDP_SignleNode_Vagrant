@@ -1,0 +1,13 @@
+- name: Create HDFS directory for vagrant
+  shell: hdfs dfs -mkdir /user/vagrant
+  sudo: yes
+  sudo_user: hdfs
+  tags:
+    - hdfs_config
+
+- name: chown /user/vagrant
+  shell: hdfs dfs -chown vagrant /user/vagrant
+  sudo: yes
+  sudo_user: hdfs
+  tags:
+    - hdfs_config
