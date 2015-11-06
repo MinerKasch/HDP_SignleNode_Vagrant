@@ -1,0 +1,12 @@
+#
+# Install the required development tools
+#
+
+- name: Install development tools
+  apt: name={{item}} state=latest
+  sudo: yes
+  with_items:
+    - maven
+    - git
+  tags:
+    - common

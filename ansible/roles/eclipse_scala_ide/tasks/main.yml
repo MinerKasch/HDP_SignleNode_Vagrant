@@ -1,0 +1,54 @@
+#
+# Install Eclipse Scala IDE
+#
+
+- name: Creating a temp directory for Eclipse installation file
+  file: path={{ tmp }}/eclipse/ state=directory
+  tags:
+    - eclipse_scala_ide
+
+- name: Check to see if Eclipse has already been downloaded
+  stat: path={{ tmp }}/eclipse/{{ eclipse_tarball }}
+  sudo: yes
+  register: eclipse_downloaded
+  tags:
+    - eclipse_scala_ide
+
+- name: Download the Eclipse Scala IDE
+  get_url: url={{ eclipse_scala_ide_url }} dest={{ tmp }}/eclipse/ 
+  sudo: yes
+  when: eclipse_downloaded.stat.exists == False
+  tags:
+    - eclipse_scala_ide
+
+- name: Unpack Eclipse
+  shell: tar xzvf {{ tmp }}/eclipse/{{ eclipse_tarball }} -C /opt
+  sudo: yes
+  tags:
+    - eclipse_scala_ide
+
+- name: Check to see if Eclipse has already been downloaded
+  stat: path={{ tmp }}/eclipse/{{ eclipse_tarball }}
+  sudo: yes
+  register: eclipse_symlink
+  tags:
+    - eclipse_scala_ide
+
+- name: Symlink to /usr/loca/bin
+  shell: ln -s /opt/eclipse/eclipse /usr/local/bin/eclipse
+  sudo: yes
+  when: eclipse_symlink.stat.exists == False
+  tags:
+    - eclipse_scala_ide
+
+- name: Define JAVA_HOME
+  lineinfile: dest=/home/vagrant/.bashrc insertafter=EOF line='export JAVA_HOME="/usr/jdk64/jdk1.8.0_40"'
+  sudo: yes
+  tags:
+    - eclipse_scala_ide
+
+- name: Add Java to PATH
+  lineinfile: dest=/home/vagrant/.bashrc insertafter=EOF line='export PATH=${JAVA_HOME}/bin:${PATH}'
+  sudo: yes
+  tags:
+    - eclipse_scala_ide

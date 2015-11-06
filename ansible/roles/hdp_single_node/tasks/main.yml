@@ -27,3 +27,9 @@
   shell: ./install-single-node-cluster.sh chdir={{ tmp }}/singlenode/
   tags:
     - single_node_install
+
+- name: Turn off the nasty logging messages in Spark
+  lineinfile: dest=/etc/spark/conf/log4j.properties regexp='^log4j.rootCategory=' line='log4j.rootCategory=ERROR, console'
+  sudo: yes
+  tags:
+    - single_node_install
