@@ -37,8 +37,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
   # Configure the virtualbox settings
   config.vm.provider "virtualbox" do |vb|
-      vb.customize ["modifyvm", :id, "--memory", 8192]
-      vb.customize ["modifyvm", :id, "--ioapic", "on", "--cpus", 2]
+      vb.customize ["modifyvm", :id, "--memory", 4096]
+      vb.customize ["modifyvm", :id, "--ioapic", "on", "--cpus", 1]
   end
 
   config.vm.hostname = "dev.minerkasch.com"

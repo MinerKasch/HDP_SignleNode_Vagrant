@@ -1,0 +1,67 @@
+#
+# Install Hadoop
+#
+
+- name: precondition - hadoop_version
+  fail: msg="ERROR - required variable 'hadoop_version' missing."
+  when: hadoop_version is not defined
+  tags:
+    - hadoop
+
+- include: set_variables.yml
+
+- name: get hadoop tarball (as tar.gz file)
+  get_url:
+    url: "{{ hadoop_tarball_url }}.tar.gz"
+    headers: 'Cookie:oraclelicense=accept-securebackup-cookie'
+    dest: "{{ hadoop_download_path }}/{{ hadoop_version_name }}.tar.gz"
+  tags:
+    - hadoop
+
+
+
+- name: mkdir for Hadoop
+  file:
+    path: "{{ hadoop_install_dir }}"
+    state: directory
+    owner: root
+    group: root
+    mode: "u=rwx,go=rx"
+  tags:
+    - hadoop
+
+- name: install Hadoop via tarball file
+  unarchive:
+    src: "{{ hadoop_download_path }}/{{ hadoop_version_name }}.tar.gz"
+    dest: "{{ hadoop_install_dir }}"
+    owner: root
+    group: root
+    mode: "u=rwx,go=rx"
+    copy: no
+  tags:
+    - hadoop
+
+#
+# Set HADOOP_HOME
+#
+- name: make sure /etc/profile.d exists
+  file: path=/etc/profile.d  state=directory
+
+- name: export HADOOP_HOME
+  template:
+    src:  hadoop_home.sh.j2
+    dest: /etc/profile.d/hadoop_home.sh
+    mode: "a+x"
+
+
+#
+# Create necessary links 
+#
+- name: link "{{ hadoop_install_dir }}/{{ hadoop_default_link_name }}"
+  file:
+    dest: "{{ hadoop_install_dir }}/{{ hadoop_default_link_name }}"
+    src: "{{ hadoop_install_dir }}/{{ hadoop_version_name }}"
+    state: link
+
+
+

@@ -1,0 +1,55 @@
+---
+
+- name: set general internal vars
+  set_fact:
+    jdk_version: "1.{{ java_version }}.0_{{ java_subversion }}"
+
+
+#
+# platform-specific variables
+#
+
+- name: set java architecture
+  set_fact:
+    jdk_arch: "{{ 'i586'  if ansible_architecture == 'i386' else 'x64' }}"
+
+- name: set java OS for Linux
+  set_fact:
+    jdk_os: linux
+  when: ansible_system == 'Linux'
+
+
+#
+# version-specific variables
+#
+
+- name: set internal vars for 1.8.0_92
+  set_fact:
+    jdk_version_detail: "{{ java_version }}u{{ java_subversion }}-b14"
+  when: java_version == 8 and java_subversion == 92
+
+- name: compose filename, if necessary
+  set_fact:
+    jdk_tarball_file: "jdk-{{ java_version }}u{{ java_subversion }}-{{ jdk_os }}-{{ jdk_arch }}"
+  when: jdk_tarball_file is not defined
+
+- name: compose url for downloading file, if necessary
+  set_fact:
+    jdk_tarball_url:  "http://download.oracle.com/otn-pub/java/jdk/{{ jdk_version_detail }}/{{ jdk_tarball_file }}"
+  when: jdk_version_detail is defined
+
+
+#
+# directories
+#
+- name: set java installation directory on Debian platforms
+  set_fact:
+    java_install_dir: /usr/lib/jvm
+    java_default_link_name: default-java
+  when: ansible_os_family == "Debian"
+
+- name: set java installation directory on non-Debian platforms
+  set_fact:
+    java_install_dir: /usr/java
+    java_default_link_name: default
+  when: ansible_os_family != "Debian" and ansible_os_family != "Darwin"

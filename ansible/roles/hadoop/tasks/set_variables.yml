@@ -1,0 +1,21 @@
+---
+
+- name: compose filename, if necessary
+  set_fact:
+    hadoop_version_name: "hadoop-{{ hadoop_version }}"
+  when: hadoop_version_name is not defined
+
+- name: compose url for downloading file, if necessary
+  set_fact:
+    hadoop_tarball_url: "http://www.motorlogy.com/apache/hadoop/common/{{ hadoop_version_name  }}/{{ hadoop_version_name }}"
+  when: hadoop_version_name is defined
+
+- debug: var=hadoop_tarball_url
+
+#
+# directories
+#
+- name: set hadoop installation directory on Debian platforms
+  set_fact:
+    hadoop_install_dir: /opt/hadoop
+    hadoop_default_link_name: default

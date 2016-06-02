@@ -4,6 +4,7 @@
 # Vagrant stuff
 acceptance_config.yml
 boxes/*
+*.retry
 /.vagrant
 /website/docs/.vagrant
 /website/www/.vagrant
