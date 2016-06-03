@@ -2,12 +2,13 @@
 - hosts: all
   max_fail_percentage: 0
   roles:
-    - common
-    - ssh_no_password
-    - jdk
-    - hadoop
-    - configure_hdfs
-    - zookeeper
+    # - common
+    # - ssh_no_password
+    # - jdk
+    # - hadoop
+    # - configure_hdfs
+    # - zookeeper
+    - accumulo
     # - gui
     # - dev_tools
     # - eclipse_scala_ide

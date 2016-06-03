@@ -1,0 +1,23 @@
+---
+#
+# Set Accumulo variables
+#
+
+- name: compose filename, if necessary
+  set_fact:
+    accumulo_version_name: "accumulo-{{ accumulo_version }}"
+  when: accumulo_version_name is not defined
+
+- name: compose url for downloading file, if necessary
+  set_fact:
+    accumulo_tarball_url: "http://mirror.cogentco.com/pub/apache/accumulo/{{ accumulo_version }}/{{ accumulo_version_name }}"
+  when: accumulo_version_name is defined
+
+
+#
+# directories
+#
+- name: set installation directory on Debian platforms
+  set_fact:
+    accumulo_install_dir: "{{ ansible_env.HOME }}/opt/accumulo"
+    accumulo_default_link_name: default

@@ -1,0 +1,72 @@
+---
+#
+# Install Accumulo
+#
+
+- name: precondition - accumulo_version
+  fail: msg="ERROR - required variable 'accumulo_version' missing."
+  when: accumulo_version is not defined
+  tags:
+    - accumulo
+
+- include: set_variables.yml
+
+- name: get accumulo tarball (as tar.gz file)
+  get_url:
+    url: "{{ accumulo_tarball_url }}-bin.tar.gz"
+    dest: "{{ accumulo_download_path }}"
+  tags:
+    - accumulo
+
+- name: mkdir for Accumulo
+  file:
+    path: "{{ accumulo_install_dir }}"
+    state: directory
+    owner: "{{ ansible_env.USER }}"
+    group: "{{ ansible_env.USER }}"
+    mode: "u=rwx,go=rx"
+  tags:
+    - accumulo
+
+- name: install Accumulo via tarball file
+  unarchive:
+    src: "{{ accumulo_download_path }}/{{ accumulo_version_name }}-bin.tar.gz"
+    dest: "{{ accumulo_install_dir }}"
+    owner: "{{ ansible_env.USER }}"
+    group: "{{ ansible_env.USER }}"
+    mode: "u=rwx,go=rx"
+    copy: no
+  tags:
+    - accumulo
+
+
+#
+# Set ACUMULO_HOME
+#
+- name: make sure /etc/profile.d exists
+  file: path=/etc/profile.d  state=directory
+  become: yes
+
+- name: export ACCUMULO_HOME
+  template:
+    src:  accumulo_home.sh.j2
+    dest: /etc/profile.d/accumulo_home.sh
+    mode: "a+x"
+  become: yes
+
+#
+# Create necessary links 
+#
+- name: link "{{ accumulo_install_dir }}/{{ accumulo_default_link_name }}"
+  file:
+    dest: "{{ accumulo_install_dir }}/{{ accumulo_default_link_name }}"
+    src: "{{ accumulo_install_dir }}/{{ accumulo_version_name }}"
+    state: link
+
+- name: /etc/accumulo
+  file:
+    dest: "/etc/accumulo"
+    src: "{{ accumulo_install_dir }}/{{ accumulo_default_link_name }}/conf"
+    state: link
+  become: yes
+
