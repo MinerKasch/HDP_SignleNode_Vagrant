@@ -1,0 +1,100 @@
+---
+#
+# Install Zookeeper
+#
+
+- name: precondition - zookeeper_version
+  fail: msg="ERROR - required variable 'zookeeper_version' missing."
+  when: zookeeper_version is not defined
+  tags:
+    - zookeeper
+
+- include: set_variables.yml
+
+- name: get zookeeper tarball (as tar.gz file)
+  get_url:
+    url: "{{ zookeeper_tarball_url }}.tar.gz"
+    dest: "{{ zookeeper_download_path }}"
+  tags:
+    - zookeeper
+
+- name: mkdir for Zookeeper
+  file:
+    path: "{{ zookeeper_install_dir }}"
+    state: directory
+    owner: "{{ ansible_env.USER }}"
+    group: "{{ ansible_env.USER }}"
+    mode: "u=rwx,go=rx"
+  tags:
+    - zookeeper
+
+- name: install zookeeper via tarball file
+  unarchive:
+    src: "{{ zookeeper_download_path }}/{{ zookeeper_version_name }}.tar.gz"
+    dest: "{{ zookeeper_install_dir }}"
+    owner: "{{ ansible_env.USER }}"
+    group: "{{ ansible_env.USER }}"
+    mode: "u=rwx,go=rx"
+    copy: no
+  tags:
+    - zookeeper
+
+#
+# Set ZOOKEEPER_HOME
+#
+- name: make sure /etc/profile.d exists
+  file: path=/etc/profile.d  state=directory
+  become: yes
+
+- name: export ZOOKEEPER_HOME
+  template:
+    src:  zookeeper_home.sh.j2
+    dest: /etc/profile.d/zookeeper_home.sh
+    mode: "a+x"
+  become: yes
+
+#
+# Create necessary links 
+#
+- name: link "{{ zookeeper_install_dir }}/{{ zookeeper_default_link_name }}"
+  file:
+    dest: "{{ zookeeper_install_dir }}/{{ zookeeper_default_link_name }}"
+    src: "{{ zookeeper_install_dir }}/{{ zookeeper_version_name }}"
+    state: link
+
+- name: /etc/zookeeper
+  file:
+    dest: "/etc/zookeeper"
+    src: "{{ zookeeper_install_dir }}/{{ zookeeper_default_link_name }}/conf"
+    state: link
+  become: yes
+
+
+#
+# Copy confs
+#
+- name: copy zoo.cfg
+  copy:
+    src: "zoo.cfg"
+    dest: "{{ zookeeper_install_dir }}/{{ zookeeper_default_link_name }}/conf/zoo.cfg"
+    mode: "u=rwx,go=rx"
+  become: yes
+
+
+#
+# Create zookeeper directory
+#
+- name: create /tmp/zookeeper
+  file:
+    path: /tmp/zookeeper
+    state: directory
+    owner: "{{ ansible_env.USER }}"
+    group: "{{ ansible_env.USER }}"
+    mode: "u=rwx,go=rx"
+  tags:
+    - zookeeper
+
+- name: start Zookeeper
+  shell: source /etc/profile && zkServer.sh start
+  args:
+    executable: /bin/bash

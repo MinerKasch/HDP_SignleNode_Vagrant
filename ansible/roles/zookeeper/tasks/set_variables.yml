@@ -1,0 +1,23 @@
+---
+#
+# Set Zookeeper variables
+#
+
+- name: compose filename, if necessary
+  set_fact:
+    zookeeper_version_name: "zookeeper-{{ zookeeper_version }}"
+  when: zookeeper_version_name is not defined
+
+- name: compose url for downloading file, if necessary
+  set_fact:
+    zookeeper_tarball_url: "http://mirrors.advancedhosters.com/apache/zookeeper/{{ zookeeper_version_name }}/{{ zookeeper_version_name }}"
+  when: zookeeper_version_name is defined
+
+
+#
+# directories
+#
+- name: set installation directory on Debian platforms
+  set_fact:
+    zookeeper_install_dir: "{{ ansible_env.HOME }}/opt/zookeeper"
+    zookeeper_default_link_name: default
