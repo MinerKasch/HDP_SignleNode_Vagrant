@@ -21,3 +21,15 @@
   when: ssh_key.stat.exists == False
   tags:
     - ssh_no_password
+
+- name: Add fingerprint to known_hosts
+  shell: ssh-keyscan -H localhost >> {{ansible_env.HOME }}/.ssh/known_hosts
+  when: ssh_key.stat.exists == False
+  tags:
+    - ssh_no_password
+
+- name: Add fingerprint to known_hosts
+  shell: ssh-keyscan -H 0.0.0.0 >> {{ansible_env.HOME }}/.ssh/known_hosts
+  when: ssh_key.stat.exists == False
+  tags:
+    - ssh_no_password

@@ -2,11 +2,10 @@
 - hosts: all
   max_fail_percentage: 0
   roles:
-    # - common
-    # - ssh_no_password
-    # - jdk
-    # - hadoop
-
+    - common
+    - ssh_no_password
+    - jdk
+    - hadoop
     - configure_hdfs
     # - gui
     # - dev_tools

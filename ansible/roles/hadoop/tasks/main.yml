@@ -94,6 +94,18 @@
     dest: "/etc/hadoop/hdfs-site.xml"
   become: yes
 
+- name: copy mapred-site.xml
+  copy:
+    src: "mapred-site.xml"
+    dest: "/etc/hadoop/mapred-site.xml"
+  become: yes
+
+- name: copy yarn-site.xml
+  copy:
+    src: "yarn-site.xml"
+    dest: "/etc/hadoop/yarn-site.xml"
+  become: yes
+
 
 #
 #
