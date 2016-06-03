@@ -1,17 +1,13 @@
 ---
 - hosts: all
   max_fail_percentage: 0
-  become: yes
-  become_method: sudo
   roles:
-    - common
-    - ssh_no_password
-    - jdk
-    - hadoop
-    # - ambari_server
-    # - ambari_agent
-    # - hdp_single_node
-    # - configure_hdfs
+    # - common
+    # - ssh_no_password
+    # - jdk
+    # - hadoop
+
+    - configure_hdfs
     # - gui
     # - dev_tools
     # - eclipse_scala_ide

@@ -1,3 +1,5 @@
 
 hadoop_version: 2.7.2
 hadoop_download_path: /tmp
+
+hadoop_reformat_namenode: true

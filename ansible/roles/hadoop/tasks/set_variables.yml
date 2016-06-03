@@ -10,12 +10,22 @@
     hadoop_tarball_url: "http://www.motorlogy.com/apache/hadoop/common/{{ hadoop_version_name  }}/{{ hadoop_version_name }}"
   when: hadoop_version_name is defined
 
-- debug: var=hadoop_tarball_url
+
+- name: format_namenode.sh set to reformat
+  set_fact:
+    format_namenode_option: Y
+  when: hadoop_reformat_namenode
+
+- name: format_namenode.sh set to not reformat
+  set_fact:
+    format_namenode_option: N
+  when: not hadoop_reformat_namenode
+
 
 #
 # directories
 #
 - name: set hadoop installation directory on Debian platforms
   set_fact:
-    hadoop_install_dir: /opt/hadoop
+    hadoop_install_dir: "{{ ansible_env.HOME }}/opt/hadoop"
     hadoop_default_link_name: default

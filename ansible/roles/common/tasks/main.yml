@@ -12,7 +12,10 @@
     - common
 
 - name: Start NTP
-  service: name=ntp state=started enabled=yes
+  service: 
+    name: ntp 
+    state: started
+    enabled: yes
   become: yes
   tags:
     - common

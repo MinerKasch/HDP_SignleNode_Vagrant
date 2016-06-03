@@ -17,6 +17,7 @@
     url: "{{ jdk_tarball_url }}.tar.gz"
     headers: 'Cookie:oraclelicense=accept-securebackup-cookie'
     dest: "{{ java_download_path }}/{{ jdk_tarball_file }}.tar.gz"
+  become: yes
   when: ansible_pkg_mgr != "yum" and ansible_os_family != 'Darwin'
 
 - name: mkdir for Java
@@ -26,6 +27,8 @@
     owner: root
     group: root
     mode: "u=rwx,go=rx"
+  become: yes
+
 
 - name: install JDK via tarball file
   unarchive:
@@ -35,18 +38,24 @@
     group: root
     mode: "go-w"
     copy: no
+  become: yes
+
 
 #
 # Set JAVA_HOME
 #
 - name: make sure /etc/profile.d exists
   file: path=/etc/profile.d  state=directory
+  become: yes
+
 
 - name: export JAVA_HOME
   template:
     src:  ../templates/java_home.sh.j2
     dest: /etc/profile.d/java_home.sh
     mode: "a+x"
+  become: yes
+
 
 
 #
@@ -57,28 +66,36 @@
     dest: "{{ java_install_dir }}/{{ java_default_link_name }}"
     src: "{{ java_install_dir }}/jdk{{ jdk_version }}"
     state: link
+  become: yes
+
 
 - name: alternatives link for "java"
   alternatives:
     name: java
     link: /usr/bin/java
     path: "{{ java_install_dir }}/{{ java_default_link_name }}/bin/java"
+  become: yes
+
 
 - name: alternatives link for "javac"
   alternatives:
     name: javac
     link: /usr/bin/javac
     path: "{{ java_install_dir }}/{{ java_default_link_name }}/bin/javac"
+  become: yes
+
 
 - name: alternatives link for "jar"
   alternatives:
     name: jar
     link: /usr/bin/jar
     path: "{{ java_install_dir }}/{{ java_default_link_name }}/bin/jar"
+  become: yes
 
 - name: check if "java_sdk" target exists
   stat: path=/usr/lib/jvm/java
   register: filecheck
+  become: yes
 
 - name: alternatives link for "java_sdk"
   alternatives:
@@ -86,3 +103,4 @@
     link: /usr/lib/jvm/java
     path: "{{ java_install_dir }}/{{ java_default_link_name }}"
   when: filecheck and filecheck.stat.exists
+  become: yes

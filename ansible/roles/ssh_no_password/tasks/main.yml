@@ -1,24 +1,23 @@
+---
 #
 # Enable passwordless ssh between machines
 #
 
 - name: Check to see if SSH keys have already been generated
-  stat: path=/root/.ssh/id_rsa
-  become: yes
+  stat: 
+    path: "{{ansible_env.HOME }}/.ssh/id_rsa"
   register: ssh_key
   tags:
     - ssh_no_password
 
 - name: Generate SSH keys for passwordless SSH
-  shell: ssh-keygen -N '' -f /root/.ssh/id_rsa
-  become: yes
+  shell: "ssh-keygen -N '' -f {{ansible_env.HOME }}/.ssh/id_rsa"
   when: ssh_key.stat.exists == False
   tags:
     - ssh_no_password
 
 - name: Add SSH Public Key to the authorized_keys file
-  shell: cat /root/.ssh/id_rsa.pub >> /root/.ssh/authorized_keys
-  become: yes
+  shell: cat {{ansible_env.HOME }}/.ssh/id_rsa.pub >> {{ansible_env.HOME }}/.ssh/authorized_keys
   when: ssh_key.stat.exists == False
   tags:
     - ssh_no_password

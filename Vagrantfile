@@ -18,8 +18,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   #
   # Configure the network ports being forwarded
 
-  # Ambari
-  config.vm.network :forwarded_port, guest: 8080, host: 8080
+  # HDFS
+  config.vm.network :forwarded_port, guest: 50070, host: 50070
 
   # YARN
   config.vm.network :forwarded_port, guest: 8088, host: 8088
